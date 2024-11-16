@@ -4,6 +4,7 @@ REGISTRY_NAME=synology
 IMAGE_NAME=synology-csi
 IMAGE_VERSION=v1.2.0
 IMAGE_TAG=$(REGISTRY_NAME)/$(IMAGE_NAME):$(IMAGE_VERSION)
+CONTAINER_BIN=$(shell which podman || which docker)
 
 # For now, only build linux/amd64 platform
 ifeq ($(GOARCH),)
@@ -22,10 +23,10 @@ synology-csi-driver:
 	$(BUILD_ENV) go build -v -ldflags $(BUILD_FLAGS) -o ./bin/synology-csi-driver ./
 
 docker-build:
-	docker build -f Dockerfile -t $(IMAGE_TAG) .
+	$(CONTAINER_BIN) build -f Dockerfile -t $(IMAGE_TAG) .
 
 docker-build-multiarch:
-	docker buildx build -t $(IMAGE_TAG) --platform linux/amd64,linux/arm/v7,linux/arm64 . --push
+	$(CONTAINER_BIN) buildx build -t $(IMAGE_TAG) --platform linux/amd64,linux/arm/v7,linux/arm64 . --push
 
 synocli:
 	@mkdir -p bin
